@@ -1,28 +1,32 @@
-# ──────────────────────────────────────────────────────────────────────
-#  EPS2 – Dossier Patient  ·  docker-compose
+# ──────────────────────────────────────────────────────────────────
+#  EPS2 – Dossier Patient  ·  deux services indépendants
 #
-#  Démarrage  : docker compose up -d
-#  Arrêt      : docker compose down
-#  Logs API   : docker compose logs -f api
-#  Reset DB   : docker compose down -v   (⚠ supprime les données)
-# ──────────────────────────────────────────────────────────────────────
+#  Démarrage   : docker compose up -d --build
+#  Arrêt       : docker compose down
+#  Logs        : docker compose logs -f
+#  Reset DB    : docker compose down -v   ⚠ supprime les données
+# ──────────────────────────────────────────────────────────────────
 services:
 
+  # ── API – Express + sql.js ──────────────────────────────────────
   api:
     build:
       context: ./server
       dockerfile: Dockerfile
     image: eps2-api:latest
     container_name: eps2-api
-    ports:
-      - "${PORT:-4000}:4000"
+    # Non exposé à l'hôte : seul nginx y accède via le réseau interne
+    expose:
+      - "4000"
     volumes:
-      # Monte uniquement data.db — le code reste dans l'image
+      # Seul data.db est persisté ; le code reste dans l'image
       - eps2-db:/app/data.db
     environment:
       NODE_ENV: production
       PORT: 4000
     restart: unless-stopped
+    networks:
+      - eps2-net
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "4000"]
       interval: 30s
@@ -30,7 +34,34 @@ services:
       start_period: 15s
       retries: 3
 
-# ── Volume nommé : données SQLite persistantes ─────────────────────
+  # ── Web – React (bundle Vite) servi par nginx ───────────────────
+  web:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    image: eps2-web:latest
+    container_name: eps2-web
+    ports:
+      - "${WEB_PORT:-80}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - eps2-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/", ">", "/dev/null"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+# ── Réseau interne partagé ─────────────────────────────────────────
+networks:
+  eps2-net:
+    name: eps2-net
+
+# ── Volume SQLite persistant ───────────────────────────────────────
 volumes:
   eps2-db:
     name: eps2-db
