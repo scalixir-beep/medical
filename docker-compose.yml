@@ -1,0 +1,36 @@
+# ──────────────────────────────────────────────────────────────────────
+#  EPS2 – Dossier Patient  ·  docker-compose
+#
+#  Démarrage  : docker compose up -d
+#  Arrêt      : docker compose down
+#  Logs API   : docker compose logs -f api
+#  Reset DB   : docker compose down -v   (⚠ supprime les données)
+# ──────────────────────────────────────────────────────────────────────
+services:
+
+  api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    image: eps2-api:latest
+    container_name: eps2-api
+    ports:
+      - "${PORT:-4000}:4000"
+    volumes:
+      # Monte uniquement data.db — le code reste dans l'image
+      - eps2-db:/app/data.db
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "4000"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+
+# ── Volume nommé : données SQLite persistantes ─────────────────────
+volumes:
+  eps2-db:
+    name: eps2-db
