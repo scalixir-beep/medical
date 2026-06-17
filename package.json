@@ -1,0 +1,15 @@
+{
+  "name": "eps2-dossier-patient",
+  "version": "1.0.0",
+  "description": "Prototype – Plateforme de gestion du dossier patient (EPS2). React + Express + SQLite.",
+  "private": true,
+  "scripts": {
+    "postinstall": "npm install --prefix server && npm install --prefix client",
+    "dev": "concurrently -n API,WEB -c blue,green \"npm start --prefix server\" \"npm run dev --prefix client\"",
+    "server": "npm start --prefix server",
+    "client": "npm run dev --prefix client"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
