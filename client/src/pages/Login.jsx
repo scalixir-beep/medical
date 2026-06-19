@@ -88,7 +88,10 @@ export default function Login() {
             <b>Comptes de démonstration</b><br/>
             Administrateur — <b>admin / admin</b><br/>
             Médecin — <b>medecin / medecin</b><br/>
-            Utilisateur (accueil) — <b>user / user</b>
+            Infirmier — <b>infirmier / infirmier</b><br/>
+            Accueil — <b>accueil / accueil</b><br/>
+            Pharmacien — <b>pharmacien / pharmacien</b><br/>
+            Biologiste — <b>biologiste / biologiste</b>
           </div>
         </form>
       </div>

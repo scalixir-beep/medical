@@ -4,6 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EPS2 — Dossier Patient</title>
+    <!-- Anti-flash dark mode : applique le thème avant le premier rendu React -->
+    <script>
+      try {
+        if (localStorage.getItem("eps2_theme") === "dark")
+          document.documentElement.setAttribute("data-theme", "dark");
+      } catch {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

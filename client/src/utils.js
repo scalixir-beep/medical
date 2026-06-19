@@ -6,16 +6,25 @@ export function fmtDate(iso) {
 
 export function age(iso) {
   if (!iso) return "—";
-  const birth = new Date(iso);
-  const diff = Date.now() - birth.getTime();
-  return Math.floor(diff / (365.25 * 24 * 3600 * 1000)) + " ans";
+  return Math.floor((Date.now() - new Date(iso)) / (365.25 * 24 * 3600 * 1000)) + " ans";
 }
 
 export function statusBadge(statut) {
-  const map = {
-    "Planifié": "blue",
-    "Honoré": "green",
-    "Annulé": "red",
-  };
+  const map = { "Planifié": "blue", "Honoré": "green", "Annulé": "red" };
+  return map[statut] || "blue";
+}
+
+export function hospBadge(statut) {
+  const map = { "En cours": "green", "Sorti": "blue", "Transféré": "amber" };
+  return map[statut] || "blue";
+}
+
+export function analyseBadge(statut) {
+  const map = { "En attente": "amber", "En cours": "blue", "Résultat disponible": "green" };
+  return map[statut] || "blue";
+}
+
+export function ordoBadge(statut) {
+  const map = { "En attente": "amber", "Dispensée": "green", "Partielle": "blue" };
   return map[statut] || "blue";
 }
