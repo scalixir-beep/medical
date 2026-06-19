@@ -21,7 +21,7 @@ WORKDIR /var/www/html
 COPY . .
 
 # ── Dépendances PHP (prod uniquement) ─────────────────────────
-RUN composer install --no-dev --optimize-autoloader --no-interaction \
+RUN composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs \
     && php artisan config:clear \
     && php artisan route:clear
 
