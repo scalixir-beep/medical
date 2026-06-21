@@ -3,7 +3,7 @@
 #  Build  : docker build -t eps2-laravel ./backend
 #  Run    : docker run -p 8000:80 -v eps2-db:/var/www/html/database eps2-laravel
 # ─────────────────────────────────────────────────────────────
-FROM php:8.2-fpm-alpine
+FROM php:8.3-fpm-alpine
 
 # ── Dépendances système ────────────────────────────────────────
 RUN apk add --no-cache \
