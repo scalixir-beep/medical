@@ -7,7 +7,7 @@ if [ ! -f /var/www/html/database/database.sqlite ]; then
     chown www-data:www-data /var/www/html/database/database.sqlite
 fi
 
-# Migrations + seed au premier démarrage (idempotent grâce à --seed)
+# Migrations au démarrage (idempotent)
 php artisan migrate --force
 
 # Optimisations production
@@ -15,4 +15,5 @@ php artisan config:cache
 php artisan route:cache
 php artisan event:cache
 
-exec /usr/bin/supervisord -c /etc/supervisord.conf
+# Démarrer Supervisor (Debian : /etc/supervisor/supervisord.conf)
+exec /usr/bin/supervisord -c /etc/supervisor/supervisord.conf
