@@ -16,13 +16,23 @@ export function AuthProvider({ children }) {
     setUser(data.user);
   }
 
+  function loginWithToken(token, userData) {
+    setToken(token);
+    localStorage.setItem("eps2_user", JSON.stringify(userData));
+    setUser(userData);
+  }
+
   function logout() {
     clearToken();
     localStorage.removeItem("eps2_user");
     setUser(null);
   }
 
-  return <AuthCtx.Provider value={{ user, login, logout }}>{children}</AuthCtx.Provider>;
+  return (
+    <AuthCtx.Provider value={{ user, login, loginWithToken, logout }}>
+      {children}
+    </AuthCtx.Provider>
+  );
 }
 
 export function useAuth() { return useContext(AuthCtx); }
