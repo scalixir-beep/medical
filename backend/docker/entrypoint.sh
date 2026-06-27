@@ -20,4 +20,7 @@ php artisan config:cache
 php artisan route:cache
 php artisan event:cache
 
+# Génération de la documentation Swagger
+php artisan l5-swagger:generate
+
 exec /usr/bin/supervisord -c /etc/supervisor/supervisord.conf

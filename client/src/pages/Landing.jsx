@@ -77,7 +77,7 @@ function AppMockup() {
         <rect x="10" y="13" width="26" height="26" rx="6" fill="#117a3d"/>
         <path d="M20 19h6v5h5v5h-5v5h-6v-5h-5v-5h5z" fill="white"/>
         <text x="42" y="24" fill="white" fontSize="9.5" fontWeight="700" {...F}>Dossier Patient</text>
-        <text x="42" y="35" fill="#a7d2b6" fontSize="8" {...F}>EPS2 · Sénégal</text>
+        <text x="42" y="35" fill="#a7d2b6" fontSize="8" {...F}>CHRASNT · Thiès</text>
 
         {/* Séparateur */}
         <line x1="10" y1="50" x2="148" y2="50" stroke="rgba(255,255,255,0.12)" strokeWidth="1"/>
@@ -107,7 +107,7 @@ function AppMockup() {
 
         {/* Rôle footer */}
         <text x="12" y="556" fill="#f4b400" fontSize="8" fontWeight="700" letterSpacing="0.5" {...F}>ADMINISTRATEUR</text>
-        <text x="12" y="568" fill="#6aa880" fontSize="8" {...F}>Plateforme EPS2 · v2.0</text>
+        <text x="12" y="568" fill="#6aa880" fontSize="8" {...F}>CHRASNT · Thiès · v2.0</text>
 
         {/* ══════════════ TOPBAR ══════════════ */}
         <rect x="158" y="0" width="762" height="52" fill="white"/>
@@ -276,9 +276,12 @@ function FAQ() {
 /* ── Roles card ── */
 function RolesCard() {
   const roles = [
-    { bg:"#efe3c2", color:"#8a6a00", Icon:Settings,    label:"Administrateur", perms:"Tous les modules · Gestion utilisateurs · Config" },
-    { bg:"#e6f2ea", color:"#0c5c2e", Icon:Stethoscope, label:"Médecin",         perms:"Dossiers · Consultations · Hospit. · Labo · Pharma" },
-    { bg:"#e2ecf6", color:"#2b5a8a", Icon:Users,        label:"Accueil",          perms:"Patients · Rendez-vous · Tableau de bord" },
+    { bg:"#efe3c2", color:"#8a6a00", Icon:Settings,    label:"Administrateur", perms:"Accès total · Utilisateurs · Config · Audit" },
+    { bg:"#e6f2ea", color:"#0c5c2e", Icon:Stethoscope, label:"Médecin",        perms:"Consultations · Hospitalisation · Ordonnances · Labo" },
+    { bg:"#e2ecf6", color:"#2b5a8a", Icon:Users,       label:"Infirmier",      perms:"Patients · Rendez-vous · Suivi hospitalier" },
+    { bg:"#f3e8f8", color:"#7b3fa0", Icon:UserRound,   label:"Accueil",        perms:"Patients · Rendez-vous · Tableau de bord" },
+    { bg:"#fdf0e0", color:"#a05c00", Icon:Pill,        label:"Pharmacien",     perms:"Ordonnances · Dispensation · Stock médicaments" },
+    { bg:"#e0f0f8", color:"#1a6a8a", Icon:FlaskConical,label:"Biologiste",     perms:"Analyses · Résultats laboratoire" },
   ];
   return (
     <div className="lp-roles-card">
@@ -400,7 +403,7 @@ export default function Landing() {
             <Logo size={36}/>
             <div>
               <span className="lp-brand-name">Dossier Patient</span>
-              <span className="lp-brand-badge">EPS2</span>
+              <span className="lp-brand-badge">CHRASNT</span>
             </div>
           </div>
           <nav className="lp-nav-links">
@@ -430,12 +433,12 @@ export default function Landing() {
               <span className="lp-flag-label">République du Sénégal</span>
             </div>
             <h1 className="lp-hero-h1">
-              La santé numérique<br/>
-              au service des{" "}
-              <span className="lp-hero-accent">EPS2</span>
+              Le dossier patient numérique<br/>
+              du{" "}
+              <span className="lp-hero-accent">CHRASNT de Thiès</span>
             </h1>
             <p className="lp-hero-sub">
-              Centralisez le dossier patient, fluidifiez le parcours de soins et fiabilisez les données médicales de votre établissement de santé.
+              Centre Hospitalier Régional El Hadji Ahmadou Sakhir Ndiéguène — Centralisez les dossiers patients, fluidifiez le parcours de soins et fiabilisez les données médicales de l'établissement.
             </p>
             <div className="lp-hero-actions">
               <Link to="/login" className="lp-btn-gold-hero">
@@ -446,13 +449,13 @@ export default function Landing() {
               </a>
             </div>
             <div className="lp-hero-kpis">
-              <div className="lp-kpi"><span className="lp-kpi-n"><KpiCounter to={3}/></span><span className="lp-kpi-l">Rôles</span></div>
+              <div className="lp-kpi"><span className="lp-kpi-n"><KpiCounter to={6}/></span><span className="lp-kpi-l">Rôles métier</span></div>
               <div className="lp-kpi-sep"/>
               <div className="lp-kpi"><span className="lp-kpi-n"><KpiCounter to={9}/></span><span className="lp-kpi-l">Modules</span></div>
               <div className="lp-kpi-sep"/>
               <div className="lp-kpi"><span className="lp-kpi-n"><KpiCounter to={100} suffix="%"/></span><span className="lp-kpi-l">Local</span></div>
               <div className="lp-kpi-sep"/>
-              <div className="lp-kpi"><span className="lp-kpi-n">EPS2</span><span className="lp-kpi-l">Certifié</span></div>
+              <div className="lp-kpi"><span className="lp-kpi-n">EPS2</span><span className="lp-kpi-l">Thiès</span></div>
             </div>
           </div>
 
@@ -470,9 +473,9 @@ export default function Landing() {
       <div className="lp-stats-strip">
         {[
           { n:"9",    l:"Modules métier"             },
-          { n:"3",    l:"Niveaux d'accès"            },
+          { n:"6",    l:"Rôles utilisateurs"         },
           { n:"100%", l:"Hébergement local"          },
-          { n:"∞",    l:"Dossiers patients"          },
+          { n:"4 000+", l:"Naissances / an"          },
           { n:"24/7", l:"Disponibilité"              },
         ].map(({ n, l }) => (
           <div className="lp-stats-item" key={l}>
@@ -488,7 +491,7 @@ export default function Landing() {
           <div className="lp-sec-head reveal">
             <span className="lp-tag">Fonctionnalités</span>
             <h2 className="lp-sec-h2">Tout ce dont votre établissement a besoin</h2>
-            <p className="lp-sec-desc">Une plateforme complète pensée pour les équipes médicales et administratives des hôpitaux publics sénégalais.</p>
+            <p className="lp-sec-desc">Une plateforme complète pensée pour les équipes du CHRASNT de Thiès : médecins, infirmiers, accueil, pharmaciens et biologistes.</p>
           </div>
           <div className="lp-feat-grid">
             {features.map(({ Icon, title, desc }, i) => (
@@ -522,7 +525,7 @@ export default function Landing() {
           <div className="lp-sec-head reveal">
             <span className="lp-tag">Modules</span>
             <h2 className="lp-sec-h2">Un écosystème intégré</h2>
-            <p className="lp-sec-desc">Six modules interconnectés couvrant l'ensemble du cycle de prise en charge du patient.</p>
+            <p className="lp-sec-desc">Neuf modules interconnectés couvrant l'ensemble du parcours patient au CHRASNT : de l'admission à la sortie.</p>
           </div>
           <div className="lp-mod-grid lp-mod-grid-3">
             {modules.map(({ Icon, name, desc }, i) => (
@@ -569,7 +572,7 @@ export default function Landing() {
           <div className="lp-split-left reveal">
             <span className="lp-tag">Sécurité & Conformité</span>
             <h2 className="lp-sec-h2 lp-left">Des données médicales protégées</h2>
-            <p className="lp-sec-desc lp-left">Hébergement local, contrôle d'accès granulaire et traçabilité complète pour répondre aux exigences des établissements de santé publique.</p>
+            <p className="lp-sec-desc lp-left">Hébergement local au CHRASNT, contrôle d'accès par rôle et traçabilité complète pour garantir la conformité réglementaire et la confidentialité des données médicales.</p>
             <div className="lp-trust-wrap">
               {trust.map(({ Icon, label }, i) => (
                 <span className="lp-trust-badge" key={i}>
@@ -599,8 +602,8 @@ export default function Landing() {
         <div className="lp-wrap lp-cta-inner">
           <div className="lp-cta-text">
             <div className="lp-cta-icon"><Heart size={32} fill="rgba(255,255,255,0.15)" strokeWidth={1.5}/></div>
-            <h2>Prêt à digitaliser votre établissement ?</h2>
-            <p>Accédez dès maintenant à la plateforme de démonstration complète.</p>
+            <h2>Prêt à digitaliser le CHRASNT de Thiès ?</h2>
+            <p>Accédez dès maintenant à la plateforme de démonstration complète du Dossier Patient Informatisé.</p>
           </div>
           <Link to="/login" className="lp-btn-gold-hero lp-btn-lg">
             Commencer maintenant <ChevronRight size={17} strokeWidth={2.5}/>
@@ -618,12 +621,12 @@ export default function Landing() {
             <div className="lp-footer-brand">
               <Logo size={32}/>
               <div>
-                <div className="lp-footer-name">Dossier Patient EPS2</div>
-                <div className="lp-footer-sub">Établissement Public de Santé de Niveau 2</div>
+                <div className="lp-footer-name">Dossier Patient · CHRASNT</div>
+                <div className="lp-footer-sub">CHR El Hadji Ahmadou Sakhir Ndiéguène · Thiès</div>
               </div>
             </div>
             <p className="lp-footer-about">
-              Plateforme numérique de gestion du dossier patient, développée dans le cadre de la Stratégie Sénégal Numérique 2050.
+              Plateforme numérique de gestion du dossier patient de l'EPS2 de Thiès, développée dans le cadre de la Stratégie Sénégal Numérique 2050 et du Plan Stratégique Santé Digitale (PSSD).
             </p>
             <div className="lp-footer-flag-inline">
               <span style={{ background:"#00853F" }}/>
@@ -646,8 +649,8 @@ export default function Landing() {
 
         <div className="lp-footer-bottom">
           <div className="lp-wrap lp-footer-bottom-inner">
-            <span>© {new Date().getFullYear()} — Dossier Patient EPS2 · République du Sénégal</span>
-            <span>Prototype v2 · Données médicales protégées</span>
+            <span>© {new Date().getFullYear()} — CHRASNT · Dossier Patient Informatisé · République du Sénégal</span>
+            <span>Groupe 5 · Swiss UMEF University · Juin 2026</span>
           </div>
         </div>
 

@@ -1,0 +1,1229 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "EPS2 Dossier Patient — API",
+        "description": "API REST pour la gestion des dossiers patients des établissements publics de santé du Sénégal (EPS2). Authentification via Bearer Token (Laravel Sanctum).",
+        "contact": {
+            "name": "Support EPS2",
+            "email": "support@eps2.sn"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/api",
+            "description": "Serveur principal"
+        }
+    ],
+    "paths": {
+        "/login": {
+            "post": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Authentification utilisateur",
+                "description": "Retourne un Bearer token Sanctum et le profil de l'utilisateur connecté. Ce token doit être transmis dans le header `Authorization: Bearer {token}` pour toutes les requêtes protégées.",
+                "operationId": "login",
+                "requestBody": {
+                    "description": "Identifiants de connexion",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "username",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "username": {
+                                        "description": "Identifiant de connexion",
+                                        "type": "string",
+                                        "example": "admin"
+                                    },
+                                    "password": {
+                                        "description": "Mot de passe",
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "admin"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Connexion réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "description": "Token Sanctum à utiliser dans Authorization: Bearer",
+                                            "type": "string",
+                                            "example": "1|abcdef1234567890"
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Identifiants incorrects",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Champs manquants ou invalides"
+                    }
+                }
+            }
+        },
+        "/consultations": {
+            "get": {
+                "tags": [
+                    "Consultations"
+                ],
+                "summary": "Liste des consultations",
+                "description": "Retourne les 50 consultations les plus récentes avec les informations du patient associé. **Réservé aux Médecins et Administrateurs.**",
+                "operationId": "consultationIndex",
+                "responses": {
+                    "200": {
+                        "description": "Liste des consultations",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "allOf": [
+                                            {
+                                                "$ref": "#/components/schemas/Consultation"
+                                            },
+                                            {
+                                                "properties": {
+                                                    "nom": {
+                                                        "type": "string",
+                                                        "example": "Diallo"
+                                                    },
+                                                    "prenom": {
+                                                        "type": "string",
+                                                        "example": "Aminata"
+                                                    },
+                                                    "code": {
+                                                        "type": "string",
+                                                        "example": "PAT-0001"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    },
+                    "403": {
+                        "description": "Accès refusé — rôle Médecin ou Administrateur requis"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Consultations"
+                ],
+                "summary": "Créer une consultation",
+                "description": "Enregistre une nouvelle consultation médicale pour un patient. Le médecin est automatiquement renseigné avec l'utilisateur connecté si non fourni. **Réservé aux Médecins et Administrateurs.**",
+                "operationId": "consultationStore",
+                "requestBody": {
+                    "description": "Données de la consultation",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "patient_id"
+                                ],
+                                "properties": {
+                                    "patient_id": {
+                                        "description": "Identifiant du patient",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "date": {
+                                        "description": "Date de la consultation (aujourd'hui par défaut)",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2024-06-10"
+                                    },
+                                    "medecin": {
+                                        "description": "Nom du médecin (utilisateur connecté par défaut)",
+                                        "type": "string",
+                                        "example": "Dr Fatou Ndiaye",
+                                        "nullable": true
+                                    },
+                                    "motif": {
+                                        "type": "string",
+                                        "example": "Douleur abdominale",
+                                        "nullable": true
+                                    },
+                                    "diagnostic": {
+                                        "type": "string",
+                                        "example": "Gastrite aiguë",
+                                        "nullable": true
+                                    },
+                                    "traitement": {
+                                        "type": "string",
+                                        "example": "Oméprazole 20 mg",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Consultation enregistrée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Consultation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Patient requis",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    },
+                    "403": {
+                        "description": "Accès refusé — rôle Médecin ou Administrateur requis"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/kpis": {
+            "get": {
+                "tags": [
+                    "Tableau de bord"
+                ],
+                "summary": "Statistiques et KPIs du tableau de bord",
+                "description": "Retourne les indicateurs clés de performance : totaux, évolution des consultations sur 6 mois, répartition des patients par sexe et par tranche d'âge, statuts des rendez-vous.",
+                "operationId": "kpiIndex",
+                "responses": {
+                    "200": {
+                        "description": "Données du tableau de bord",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "totals": {
+                                            "description": "Totaux globaux",
+                                            "properties": {
+                                                "patients": {
+                                                    "type": "integer",
+                                                    "example": 142
+                                                },
+                                                "consultations": {
+                                                    "type": "integer",
+                                                    "example": 873
+                                                },
+                                                "rdvAujourdhui": {
+                                                    "type": "integer",
+                                                    "example": 7
+                                                },
+                                                "rdvPlanifies": {
+                                                    "type": "integer",
+                                                    "example": 23
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "consultationsParMois": {
+                                            "description": "Consultations des 6 derniers mois",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "label": {
+                                                        "type": "string",
+                                                        "example": "Jan"
+                                                    },
+                                                    "total": {
+                                                        "type": "integer",
+                                                        "example": 45
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "patientsParSexe": {
+                                            "description": "Répartition Féminin / Masculin",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Féminin"
+                                                    },
+                                                    "value": {
+                                                        "type": "integer",
+                                                        "example": 78
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "rdvParStatut": {
+                                            "description": "Rendez-vous par statut",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Planifié"
+                                                    },
+                                                    "value": {
+                                                        "type": "integer",
+                                                        "example": 23
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "patientsParTranche": {
+                                            "description": "Répartition par tranche d'âge",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "18-39"
+                                                    },
+                                                    "value": {
+                                                        "type": "integer",
+                                                        "example": 54
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/patients": {
+            "get": {
+                "tags": [
+                    "Patients"
+                ],
+                "summary": "Liste des patients",
+                "description": "Retourne tous les patients triés par nom. Supporte la recherche par nom, prénom ou code IPP via le paramètre `q`.",
+                "operationId": "patientIndex",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Terme de recherche (nom, prénom ou code IPP)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Diallo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des patients",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Patient"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Patients"
+                ],
+                "summary": "Créer un patient",
+                "description": "Enregistre un nouveau dossier patient. Le code IPP (PAT-XXXX) est généré automatiquement.",
+                "operationId": "patientStore",
+                "requestBody": {
+                    "description": "Données du patient",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nom",
+                                    "prenom"
+                                ],
+                                "properties": {
+                                    "nom": {
+                                        "type": "string",
+                                        "example": "Diallo"
+                                    },
+                                    "prenom": {
+                                        "type": "string",
+                                        "example": "Aminata"
+                                    },
+                                    "date_naissance": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1990-05-12",
+                                        "nullable": true
+                                    },
+                                    "sexe": {
+                                        "type": "string",
+                                        "example": "F",
+                                        "nullable": true,
+                                        "enum": [
+                                            "M",
+                                            "F"
+                                        ]
+                                    },
+                                    "telephone": {
+                                        "type": "string",
+                                        "example": "+221 77 123 45 67",
+                                        "nullable": true
+                                    },
+                                    "adresse": {
+                                        "type": "string",
+                                        "example": "Dakar, Médina",
+                                        "nullable": true
+                                    },
+                                    "groupe_sanguin": {
+                                        "type": "string",
+                                        "example": "O+",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Patient créé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Patient"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Nom et prénom requis",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/patients/{id}": {
+            "get": {
+                "tags": [
+                    "Patients"
+                ],
+                "summary": "Détail d'un patient",
+                "description": "Retourne le dossier complet d'un patient avec ses consultations et rendez-vous associés.",
+                "operationId": "patientShow",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identifiant du patient",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dossier patient complet",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Patient"
+                                        },
+                                        {
+                                            "properties": {
+                                                "consultations": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Consultation"
+                                                    }
+                                                },
+                                                "rendezvous": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/RendezVous"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    },
+                    "404": {
+                        "description": "Patient introuvable",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Patients"
+                ],
+                "summary": "Supprimer un patient",
+                "description": "Supprime définitivement un dossier patient. **Réservé aux Administrateurs.**",
+                "operationId": "patientDestroy",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identifiant du patient à supprimer",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Patient supprimé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    },
+                    "403": {
+                        "description": "Accès refusé — rôle Administrateur requis"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/rendezvous": {
+            "get": {
+                "tags": [
+                    "Rendez-vous"
+                ],
+                "summary": "Liste des rendez-vous",
+                "description": "Retourne tous les rendez-vous triés par date et heure, avec les informations du patient associé.",
+                "operationId": "rendezvousIndex",
+                "responses": {
+                    "200": {
+                        "description": "Liste des rendez-vous",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "allOf": [
+                                            {
+                                                "$ref": "#/components/schemas/RendezVous"
+                                            },
+                                            {
+                                                "properties": {
+                                                    "nom": {
+                                                        "type": "string",
+                                                        "example": "Diallo"
+                                                    },
+                                                    "prenom": {
+                                                        "type": "string",
+                                                        "example": "Aminata"
+                                                    },
+                                                    "code": {
+                                                        "type": "string",
+                                                        "example": "PAT-0001"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Rendez-vous"
+                ],
+                "summary": "Planifier un rendez-vous",
+                "description": "Crée un nouveau rendez-vous pour un patient. Le statut initial est `Planifié`. Le médecin est automatiquement renseigné avec l'utilisateur connecté si non fourni.",
+                "operationId": "rendezvousStore",
+                "requestBody": {
+                    "description": "Données du rendez-vous",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "patient_id",
+                                    "date"
+                                ],
+                                "properties": {
+                                    "patient_id": {
+                                        "description": "Identifiant du patient",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "date": {
+                                        "description": "Date du rendez-vous",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2024-07-15"
+                                    },
+                                    "heure": {
+                                        "description": "Heure du rendez-vous",
+                                        "type": "string",
+                                        "format": "time",
+                                        "example": "09:30",
+                                        "nullable": true
+                                    },
+                                    "medecin": {
+                                        "description": "Médecin assigné (utilisateur connecté par défaut)",
+                                        "type": "string",
+                                        "example": "Dr Ibrahima Sow",
+                                        "nullable": true
+                                    },
+                                    "motif": {
+                                        "type": "string",
+                                        "example": "Suivi post-opératoire",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Rendez-vous planifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RendezVous"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Patient et date requis",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/rendezvous/{id}": {
+            "patch": {
+                "tags": [
+                    "Rendez-vous"
+                ],
+                "summary": "Mettre à jour le statut d'un rendez-vous",
+                "description": "Modifie le statut d'un rendez-vous existant. Utilisé pour marquer un RDV comme `Honoré` ou `Annulé`.",
+                "operationId": "rendezvousUpdate",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identifiant du rendez-vous",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "statut"
+                                ],
+                                "properties": {
+                                    "statut": {
+                                        "type": "string",
+                                        "example": "Honoré",
+                                        "enum": [
+                                            "Planifié",
+                                            "Honoré",
+                                            "Annulé"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Statut mis à jour",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RendezVous"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    },
+                    "404": {
+                        "description": "Rendez-vous introuvable"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/users": {
+            "get": {
+                "tags": [
+                    "Utilisateurs"
+                ],
+                "summary": "Liste des utilisateurs",
+                "description": "Retourne tous les comptes utilisateurs triés par rôle puis par nom. **Réservé aux Administrateurs.**",
+                "operationId": "userIndex",
+                "responses": {
+                    "200": {
+                        "description": "Liste des utilisateurs",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/User"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    },
+                    "403": {
+                        "description": "Accès refusé — rôle Administrateur requis"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Utilisateurs"
+                ],
+                "summary": "Créer un compte utilisateur",
+                "description": "Crée un nouveau compte avec un rôle défini. L'identifiant doit être unique. Le mot de passe est hashé automatiquement. **Réservé aux Administrateurs.**",
+                "operationId": "userStore",
+                "requestBody": {
+                    "description": "Données du compte à créer",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "username",
+                                    "password",
+                                    "name",
+                                    "role"
+                                ],
+                                "properties": {
+                                    "username": {
+                                        "description": "Identifiant de connexion (unique)",
+                                        "type": "string",
+                                        "example": "infirmier1"
+                                    },
+                                    "password": {
+                                        "description": "Mot de passe en clair (sera hashé)",
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "secret123"
+                                    },
+                                    "name": {
+                                        "description": "Nom complet affiché",
+                                        "type": "string",
+                                        "example": "Moussa Traoré"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "Infirmier",
+                                        "enum": [
+                                            "Administrateur",
+                                            "Médecin",
+                                            "Infirmier",
+                                            "Accueil",
+                                            "Pharmacien",
+                                            "Biologiste"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Compte créé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Champ manquant, rôle invalide ou identifiant déjà pris",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    },
+                    "403": {
+                        "description": "Accès refusé — rôle Administrateur requis"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/users/{id}": {
+            "delete": {
+                "tags": [
+                    "Utilisateurs"
+                ],
+                "summary": "Supprimer un compte utilisateur",
+                "description": "Supprime définitivement un compte utilisateur. Un administrateur ne peut pas supprimer son propre compte. **Réservé aux Administrateurs.**",
+                "operationId": "userDestroy",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identifiant du compte à supprimer",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 2
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Compte supprimé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Impossible de supprimer son propre compte",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    },
+                    "403": {
+                        "description": "Accès refusé — rôle Administrateur requis"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Patient": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "code": {
+                        "type": "string",
+                        "example": "PAT-0001"
+                    },
+                    "nom": {
+                        "type": "string",
+                        "example": "Diallo"
+                    },
+                    "prenom": {
+                        "type": "string",
+                        "example": "Aminata"
+                    },
+                    "date_naissance": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "1990-05-12",
+                        "nullable": true
+                    },
+                    "sexe": {
+                        "type": "string",
+                        "example": "F",
+                        "nullable": true,
+                        "enum": [
+                            "M",
+                            "F"
+                        ]
+                    },
+                    "telephone": {
+                        "type": "string",
+                        "example": "+221 77 123 45 67",
+                        "nullable": true
+                    },
+                    "adresse": {
+                        "type": "string",
+                        "example": "Dakar, Médina",
+                        "nullable": true
+                    },
+                    "groupe_sanguin": {
+                        "type": "string",
+                        "example": "O+",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2024-01-15"
+                    }
+                },
+                "type": "object"
+            },
+            "Consultation": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "patient_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2024-06-10"
+                    },
+                    "medecin": {
+                        "type": "string",
+                        "example": "Dr Fatou Ndiaye"
+                    },
+                    "motif": {
+                        "type": "string",
+                        "example": "Douleur abdominale",
+                        "nullable": true
+                    },
+                    "diagnostic": {
+                        "type": "string",
+                        "example": "Gastrite aiguë",
+                        "nullable": true
+                    },
+                    "traitement": {
+                        "type": "string",
+                        "example": "Oméprazole 20 mg",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "RendezVous": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "patient_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2024-07-15"
+                    },
+                    "heure": {
+                        "type": "string",
+                        "format": "time",
+                        "example": "09:30",
+                        "nullable": true
+                    },
+                    "medecin": {
+                        "type": "string",
+                        "example": "Dr Ibrahima Sow",
+                        "nullable": true
+                    },
+                    "motif": {
+                        "type": "string",
+                        "example": "Suivi post-opératoire",
+                        "nullable": true
+                    },
+                    "statut": {
+                        "type": "string",
+                        "example": "Planifié",
+                        "enum": [
+                            "Planifié",
+                            "Honoré",
+                            "Annulé"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "username": {
+                        "type": "string",
+                        "example": "medecin1"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Dr Fatou Ndiaye"
+                    },
+                    "role": {
+                        "type": "string",
+                        "example": "Médecin",
+                        "enum": [
+                            "Administrateur",
+                            "Médecin",
+                            "Infirmier",
+                            "Accueil",
+                            "Pharmacien",
+                            "Biologiste"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponse": {
+                "properties": {
+                    "error": {
+                        "type": "string",
+                        "example": "Message d'erreur"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Obtenez un token via POST /api/login, puis transmettez-le dans le header : Authorization: Bearer {token}",
+                "bearerFormat": "Sanctum",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentification",
+            "description": "Connexion et création de session"
+        },
+        {
+            "name": "Patients",
+            "description": "Dossiers patients — création, consultation, recherche"
+        },
+        {
+            "name": "Consultations",
+            "description": "Consultations médicales (Médecin + Administrateur)"
+        },
+        {
+            "name": "Rendez-vous",
+            "description": "Planification et suivi des rendez-vous"
+        },
+        {
+            "name": "Utilisateurs",
+            "description": "Gestion des comptes utilisateurs (Administrateur uniquement)"
+        },
+        {
+            "name": "Tableau de bord",
+            "description": "KPIs, statistiques et graphiques"
+        }
+    ]
+}

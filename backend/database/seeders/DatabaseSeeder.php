@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\{Consultation, Patient, RendezVous, User};
+use App\Models\{Consultation, Medicament, Patient, RendezVous, User};
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -108,6 +108,28 @@ class DatabaseSeeder extends Seeder
                 'motif'      => $motif,
                 'statut'     => $statut,
             ]);
+        }
+
+        // ── Stock médicaments ─────────────────────────────────────
+        $meds = [
+            ['Paracétamol 500 mg',      'Comprimé',   250, 50,  'boîte'],
+            ['Amoxicilline 500 mg',     'Gélule',     180, 30,  'boîte'],
+            ['Artéméther-Luméfantrine', 'Comprimé',    48, 20,  'boîte'],
+            ['Amlodipine 5 mg',         'Comprimé',    90, 20,  'boîte'],
+            ['Metformine 500 mg',        'Comprimé',   120, 25,  'boîte'],
+            ['Oméprazole 20 mg',        'Gélule',      75, 15,  'boîte'],
+            ['Ibuprofène 400 mg',       'Comprimé',   200, 40,  'boîte'],
+            ['Acide folique 5 mg',      'Comprimé',   160, 30,  'boîte'],
+            ['Sulfate ferreux',         'Comprimé',   130, 25,  'boîte'],
+            ['Sérum physiologique',     'Injectable',  18,  5,  'flacon'],
+            ['Eau ppi 10 ml',           'Injectable',  60, 10,  'ampoule'],
+            ['Céfixime 200 mg',         'Gélule',       8, 15,  'boîte'],  // stock bas intentionnel
+            ['Insuline Rapide',         'Injectable',   3, 10,  'flacon'], // rupture quasi
+            ['Chloroquine 100 mg',      'Comprimé',     0, 20,  'boîte'],  // rupture
+        ];
+
+        foreach ($meds as [$nom, $forme, $stock, $seuil, $unite]) {
+            Medicament::create(compact('nom', 'forme', 'stock', 'unite') + ['seuil_alerte' => $seuil]);
         }
     }
 }

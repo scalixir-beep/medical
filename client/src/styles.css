@@ -72,6 +72,15 @@ h1, h2, h3 { margin: 0; }
 .login-card h1 { font-size: 21px; }
 .login-card .sub { color: var(--muted); font-size: 14px; margin: 6px 0 26px; }
 .hint { margin-top: 18px; font-size: 12.5px; color: var(--muted); background: var(--chip); padding: 11px 13px; border-radius: 8px; line-height: 1.8; }
+.btn-google { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:10px 16px; border-radius:8px; font-size:14px; font-weight:600; border:1.5px solid var(--border); background:var(--card); color:var(--text); text-decoration:none; cursor:pointer; transition:background .15s,box-shadow .15s; margin-bottom:4px; }
+.btn-google:hover { background:var(--bg); box-shadow:0 2px 8px rgba(0,0,0,.08); }
+.divider-or { display:flex; align-items:center; gap:10px; color:var(--muted); font-size:12px; margin:14px 0; }
+.divider-or::before,.divider-or::after { content:""; flex:1; height:1px; background:var(--border); }
+/* Onglets login / inscription */
+.login-tabs { display:flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:20px; }
+.login-tabs button { flex:1; padding:9px; font-size:14px; font-weight:500; background:none; border:none; cursor:pointer; color:var(--muted); transition:background .15s,color .15s; }
+.login-tabs button.active { background:var(--primary); color:#fff; }
+.login-tabs button:not(.active):hover { background:var(--hover); }
 /* Login responsive */
 @media (max-width: 900px)  { .login-wrap { grid-template-columns: 1fr; } .login-hero { display: none; } }
 @media (max-width: 480px)  { .login-side { padding: 16px; } .login-card { max-width: 100%; } }
