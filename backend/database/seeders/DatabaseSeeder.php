@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\Role;
 use App\Models\{Consultation, Medicament, Patient, RendezVous, User};
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -10,12 +11,23 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // ── Utilisateurs ─────────────────────────────────────────
-        User::insert([
-            ['username' => 'admin',   'password' => Hash::make('admin'),   'name' => 'Administrateur Système', 'role' => 'Administrateur'],
-            ['username' => 'medecin', 'password' => Hash::make('medecin'), 'name' => 'Dr. Amina Diallo',       'role' => 'Médecin'],
-            ['username' => 'user',    'password' => Hash::make('user'),    'name' => 'Awa Ndoye (Accueil)',     'role' => 'Utilisateur'],
-        ]);
+        // ── Utilisateurs — un compte par rôle métier EPS2 ────────
+        $users = [
+            [Role::Administrateur, 'admin',       'admin',       'Administrateur Système'],
+            [Role::Medecin,        'medecin',     'medecin',     'Dr. Amina Diallo'],
+            [Role::SageFemme,      'sagefemme',   'sagefemme',   'Mme Rokhaya Mbaye'],
+            [Role::Infirmier,      'infirmier',   'infirmier',   'Moussa Diagne'],
+            [Role::Accueil,        'accueil',     'accueil',     'Awa Ndoye'],
+            [Role::Pharmacien,     'pharmacien',  'pharmacien',  'Ibou Sarr'],
+            [Role::Biologiste,     'biologiste',  'biologiste',  'Dr. Fatou Cissé'],
+        ];
+
+        User::insert(array_map(fn($u) => [
+            'role'     => $u[0]->value,
+            'username' => $u[1],
+            'password' => Hash::make($u[2]),
+            'name'     => $u[3],
+        ], $users));
 
         // ── Patients ──────────────────────────────────────────────
         $demo = [
@@ -131,5 +143,8 @@ class DatabaseSeeder extends Seeder
         foreach ($meds as [$nom, $forme, $stock, $seuil, $unite]) {
             Medicament::create(compact('nom', 'forme', 'stock', 'unite') + ['seuil_alerte' => $seuil]);
         }
+
+        // ── Comptes de l'équipe projet ────────────────────────────
+        $this->call(TeamSeeder::class);
     }
 }

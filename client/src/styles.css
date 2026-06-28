@@ -59,7 +59,7 @@ h1, h2, h3 { margin: 0; }
 }
 .login-hero .sun { position: absolute; right: 44px; top: 44px; opacity: 0.75; pointer-events: none; }
 .login-hero-top .tag { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: #bfe6cd; font-weight: 600; }
-.login-hero-top h2 { font-size: clamp(24px, 3vw, 36px); line-height: 1.15; margin-top: 12px; max-width: 14ch; }
+.login-hero-top h2 { font-size: clamp(20px, 2.5vw, 30px); line-height: 1.2; margin-top: 12px; max-width: 18ch; }
 .login-hero-top p.lead { color: #d8ecdf; margin-top: 14px; max-width: 36ch; font-size: 15px; line-height: 1.6; }
 .login-illus { flex: 1; min-height: 0; max-height: 360px; width: 100%; object-fit: contain; }
 .login-hero-bot { display: flex; align-items: center; gap: 14px; }
@@ -69,19 +69,20 @@ h1, h2, h3 { margin: 0; }
 .login-side { display: grid; place-items: center; padding: 24px 20px; background: var(--card); overflow-y: auto; }
 .login-card { width: 100%; max-width: 360px; }
 .brand-row { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
-.login-card h1 { font-size: 21px; }
+.login-card h1 { font-size: 20px; line-height: 1.2; }
 .login-card .sub { color: var(--muted); font-size: 14px; margin: 6px 0 26px; }
-.hint { margin-top: 18px; font-size: 12.5px; color: var(--muted); background: var(--chip); padding: 11px 13px; border-radius: 8px; line-height: 1.8; }
+.brand-row .sub { font-size: 12px; margin: 2px 0 0; color: var(--muted); }
 .btn-google { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:10px 16px; border-radius:8px; font-size:14px; font-weight:600; border:1.5px solid var(--border); background:var(--card); color:var(--text); text-decoration:none; cursor:pointer; transition:background .15s,box-shadow .15s; margin-bottom:4px; }
 .btn-google:hover { background:var(--bg); box-shadow:0 2px 8px rgba(0,0,0,.08); }
 .divider-or { display:flex; align-items:center; gap:10px; color:var(--muted); font-size:12px; margin:14px 0; }
 .divider-or::before,.divider-or::after { content:""; flex:1; height:1px; background:var(--border); }
-/* Onglets login / inscription */
 .login-tabs { display:flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:20px; }
 .login-tabs button { flex:1; padding:9px; font-size:14px; font-weight:500; background:none; border:none; cursor:pointer; color:var(--muted); transition:background .15s,color .15s; }
 .login-tabs button.active { background:var(--primary); color:#fff; }
 .login-tabs button:not(.active):hover { background:var(--hover); }
-/* Login responsive */
+.login-switch { margin-top:20px; font-size:13px; color:var(--muted); text-align:center; }
+.login-switch button { background:none; border:none; cursor:pointer; color:var(--primary); font-weight:600; font-size:13px; padding:0; text-decoration:underline; }
+.login-switch button:hover { color:var(--green-dk); }
 @media (max-width: 900px)  { .login-wrap { grid-template-columns: 1fr; } .login-hero { display: none; } }
 @media (max-width: 480px)  { .login-side { padding: 16px; } .login-card { max-width: 100%; } }
 
@@ -114,6 +115,7 @@ h1, h2, h3 { margin: 0; }
 .role-badge.accueil    { background: #e2ecf6; color: #2b5a8a; }
 .role-badge.pharmacien { background: #f3e8ff; color: #7c3aed; }
 .role-badge.biologiste { background: #d1fae5; color: #065f46; }
+.role-badge.sagefemme  { background: #fce7f3; color: #9d174d; }
 .role-badge.user       { background: #e2ecf6; color: #2b5a8a; } /* rétro-compat */
 
 /* Tag rôle dans nav sidebar */

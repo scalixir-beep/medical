@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Role;
 use App\Models\ConnexionLog;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -56,7 +57,7 @@ class AuthController extends Controller
             'username' => 'required|string|unique:users,username',
             'password' => 'required|string|min:4',
             'name'     => 'required|string',
-            'role'     => 'required|in:Médecin,Infirmier,Accueil,Pharmacien,Biologiste',
+            'role'     => 'required|in:' . implode(',', Role::registrable()),
         ]);
 
         $user = User::create([

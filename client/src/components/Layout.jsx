@@ -39,7 +39,7 @@ export default function Layout() {
     localStorage.setItem("eps2_theme", next ? "dark" : "light");
   }
 
-  const title    = TITLES[pathname] || (pathname.startsWith("/patients/") ? "Dossier patient" : "EPS2");
+  const title    = TITLES[pathname] || (pathname.startsWith("/patients/") ? "Dossier patient" : "CHRASNT");
   const initials = (user?.name || "?").split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase();
 
   useEffect(() => {
@@ -51,7 +51,7 @@ export default function Layout() {
       <aside className="sidebar">
         <div className="logo">
           <Logo size={36}/>
-          <div>Dossier Patient<small>EPS2 · Sénégal</small></div>
+          <div>CHRASNT<small>Dossier Patient Informatisé</small></div>
         </div>
 
         <nav className="nav">
@@ -121,7 +121,7 @@ export default function Layout() {
 
         <div className="foot">
           <div className="foot-role">{user?.role}</div>
-          <div>Plateforme EPS2 · v2.0</div>
+          <div>CHRASNT · Thiès · v2.0</div>
         </div>
       </aside>
 

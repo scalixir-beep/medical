@@ -6,7 +6,6 @@ import { Logo, Sun } from "../components/Brand.jsx";
 import { HealthIllustration } from "../components/HealthIllustration.jsx";
 
 const GOOGLE_API_URL = "http://localhost:8000/auth/google/redirect";
-
 const ROLES = ["Médecin", "Infirmier", "Accueil", "Pharmacien", "Biologiste"];
 
 function GoogleIcon() {
@@ -22,8 +21,9 @@ function GoogleIcon() {
 
 export default function Login() {
   const { login, loginWithToken } = useAuth();
-  const navigate   = useNavigate();
-  const [mode,     setMode]     = useState("login"); // "login" | "register"
+  const navigate = useNavigate();
+
+  const [mode,     setMode]     = useState("login");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [name,     setName]     = useState("");
@@ -32,35 +32,25 @@ export default function Login() {
   const [loading,  setLoading]  = useState(false);
 
   function switchMode(m) {
-    setMode(m);
-    setError("");
-    setUsername("");
-    setPassword("");
-    setName("");
-    setRole("Accueil");
+    setMode(m); setError("");
+    setUsername(""); setPassword(""); setName(""); setRole("Accueil");
   }
 
-  /* ── Réception du token Google après callback ── */
+  /* Réception token Google après callback */
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const token  = params.get("token");
-    const userB64 = params.get("user");
-    const err    = params.get("error");
-
-    if (err) {
+    const p = new URLSearchParams(window.location.search);
+    const token  = p.get("token");
+    const userB64 = p.get("user");
+    if (p.get("error")) {
       setError("Connexion Google échouée. Réessayez.");
       window.history.replaceState({}, "", "/login");
       return;
     }
-
     if (token && userB64) {
       try {
-        const userData = JSON.parse(atob(userB64));
-        loginWithToken(token, userData);
+        loginWithToken(token, JSON.parse(atob(userB64)));
         navigate("/");
-      } catch {
-        setError("Erreur lors de la connexion Google.");
-      }
+      } catch { setError("Erreur lors de la connexion Google."); }
       window.history.replaceState({}, "", "/login");
     }
   }, []);
@@ -76,11 +66,8 @@ export default function Login() {
         loginWithToken(data.token, data.user);
       }
       navigate("/");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    } catch (err) { setError(err.message); }
+    finally { setLoading(false); }
   }
 
   return (
@@ -89,10 +76,10 @@ export default function Login() {
       {/* ── Panneau hero gauche ── */}
       <div className="login-hero">
         <div className="login-hero-top">
-          <div className="tag">République du Sénégal</div>
-          <h2>La santé numérique au service des EPS2</h2>
+          <div className="tag">République du Sénégal · EPS2</div>
+          <h2>CHR El Hadji Ahmadou Sakhir Ndiéguène de Thiès</h2>
           <p className="lead">
-            Centralisez le dossier patient, fluidifiez le parcours de soins et fiabilisez les données médicales.
+            Plateforme numérique de gestion du Dossier Patient Informatisé — centralisez les soins, fluidifiez le parcours patient et fiabilisez les données médicales du CHRASNT.
           </p>
         </div>
 
@@ -105,7 +92,7 @@ export default function Login() {
             <span style={{ background:"#E31B23" }}/>
           </div>
           <p className="login-hero-caption">
-            Plateforme officielle — EPS2 Sénégal
+            CHRASNT · Avenue Malick Sy, Thiès · EPS2
           </p>
         </div>
 
@@ -117,26 +104,15 @@ export default function Login() {
         <form className="login-card" onSubmit={submit}>
           <div className="brand-row">
             <Logo size={44}/>
-            <div><h1>Dossier Patient EPS2</h1></div>
-          </div>
-
-          {/* ── Onglets ── */}
-          <div className="login-tabs">
-            <button type="button"
-              className={mode === "login" ? "active" : ""}
-              onClick={() => switchMode("login")}>
-              Connexion
-            </button>
-            <button type="button"
-              className={mode === "register" ? "active" : ""}
-              onClick={() => switchMode("register")}>
-              Inscription
-            </button>
+            <div>
+              <h1>Dossier Patient · CHRASNT</h1>
+              <p className="sub">Centre Hospitalier Régional de Thiès</p>
+            </div>
           </div>
 
           {error && <div className="error-msg">{error}</div>}
 
-          {/* ── Bouton Google (connexion uniquement) ── */}
+          {/* Google — connexion uniquement */}
           {mode === "login" && (
             <>
               <a href={GOOGLE_API_URL} className="btn-google">
@@ -147,18 +123,13 @@ export default function Login() {
             </>
           )}
 
-          {/* ── Champs inscription ── */}
+          {/* Champs inscription */}
           {mode === "register" && (
             <>
               <label className="field">
                 <span>Nom complet</span>
-                <input
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                  placeholder="Ex : Moussa Diallo"
-                  required
-                  autoFocus
-                />
+                <input value={name} onChange={e => setName(e.target.value)}
+                  placeholder="Ex : Moussa Diallo" required autoFocus/>
               </label>
               <label className="field">
                 <span>Rôle</span>
@@ -171,23 +142,13 @@ export default function Login() {
 
           <label className="field">
             <span>Identifiant</span>
-            <input
-              value={username}
-              onChange={e => setUsername(e.target.value)}
-              autoFocus={mode === "login"}
-              autoComplete="username"
-              required
-            />
+            <input value={username} onChange={e => setUsername(e.target.value)}
+              autoFocus={mode === "login"} autoComplete="username" required/>
           </label>
           <label className="field">
             <span>Mot de passe</span>
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              autoComplete={mode === "login" ? "current-password" : "new-password"}
-              required
-            />
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+              autoComplete={mode === "login" ? "current-password" : "new-password"} required/>
           </label>
 
           <button className="btn" style={{ width:"100%" }} disabled={loading}>
@@ -196,17 +157,17 @@ export default function Login() {
               : (mode === "login" ? "Se connecter" : "Créer mon compte")}
           </button>
 
-          {mode === "login" && (
-            <div className="hint">
-              <b>Comptes de démonstration</b><br/>
-              Administrateur — <b>admin / admin</b><br/>
-              Médecin — <b>medecin / medecin</b><br/>
-              Infirmier — <b>infirmier / infirmier</b><br/>
-              Accueil — <b>accueil / accueil</b><br/>
-              Pharmacien — <b>pharmacien / pharmacien</b><br/>
-              Biologiste — <b>biologiste / biologiste</b>
-            </div>
-          )}
+          <p className="login-switch">
+            {mode === "login" ? (
+              <>Vous n'avez pas de compte ?{" "}
+                <button type="button" onClick={() => switchMode("register")}>S'inscrire</button>
+              </>
+            ) : (
+              <>Vous avez déjà un compte ?{" "}
+                <button type="button" onClick={() => switchMode("login")}>Se connecter</button>
+              </>
+            )}
+          </p>
         </form>
       </div>
     </div>
