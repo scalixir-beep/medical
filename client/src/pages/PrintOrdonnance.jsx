@@ -118,7 +118,7 @@ export default function PrintOrdonnance() {
 
       {/* Pied de page */}
       <div className="print-footer">
-        <span>EPS2 · Dossier Patient v2.0 · République du Sénégal</span>
+        <span>CHRASNT · CHR El Hadji Ahmadou Sakhir Ndiéguène · Thiès</span>
         <span>Ordonnance n° {String(o.id).padStart(6,"0")}</span>
       </div>
     </div>

@@ -48,7 +48,7 @@ export default function Users() {
 
       <div className="toolbar">
         <div className="notice">
-          <b>6 rôles métier EPS2</b> — chaque rôle accède uniquement aux modules de sa fonction.
+          <b>6 rôles métier CHRASNT</b> — chaque rôle accède uniquement aux modules de sa fonction.
         </div>
         <button className="btn" onClick={() => { setShow(s => !s); setError(""); }}>
           {show ? "Fermer" : "+ Nouveau compte"}

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -83,8 +84,7 @@ class UserController extends Controller
             return response()->json(['error' => 'Tous les champs sont requis'], 400);
         }
 
-        $rolesValides = ['Administrateur', 'Médecin', 'Utilisateur'];
-        if (!in_array($request->role, $rolesValides)) {
+        if (!in_array($request->role, Role::values())) {
             return response()->json(['error' => 'Rôle invalide'], 400);
         }
 

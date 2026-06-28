@@ -26,6 +26,17 @@ export const PERMS = {
     users:X, connexions:X,
   },
 
+  // ── Sage-femme : maternité + pédiatrie ──
+  "Sage-femme": {
+    dashboard:A, patients:A, patientCreate:A, patientDelete:X,
+    consultations:A, consultationCreate:A,            // consultations prénatales
+    rendezvous:A,
+    hospitalisation:A, hospitalisationCreate:A,       // admet et sort en maternité
+    laboratoire:A, laboDemande:A, laboResultats:X,    // prescrit analyses
+    pharmacie:A, pharmacieOrdonnance:A, pharmacieDispenser:X, pharmacieStock:X,
+    users:X, connexions:X,
+  },
+
   // ── Infirmier : soins et suivi hospitalier ──
   "Infirmier": {
     dashboard:A, patients:A, patientCreate:X, patientDelete:X,
@@ -90,6 +101,7 @@ export function roleClass(role) {
   const map = {
     "Administrateur": "admin",
     "Médecin":        "medecin",
+    "Sage-femme":     "sagefemme",
     "Infirmier":      "infirmier",
     "Accueil":        "accueil",
     "Pharmacien":     "pharmacien",

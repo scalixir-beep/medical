@@ -52,11 +52,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/medicaments/{id}', [MedicamentController::class, 'update']);
 
     // ── Hospitalisation ────────────────────────────────────────────────────
+    Route::get('/hospitalisations/meta',    [HospitalisationController::class, 'meta']);
     Route::get('/hospitalisations',        [HospitalisationController::class, 'index']);
     Route::post('/hospitalisations',       [HospitalisationController::class, 'store']);
     Route::patch('/hospitalisations/{id}', [HospitalisationController::class, 'update']);
 
     // ── Laboratoire ────────────────────────────────────────────────────────
+    Route::get('/analyses/meta',    [AnalyseController::class, 'meta']);
     Route::get('/analyses',        [AnalyseController::class, 'index']);
     Route::post('/analyses',       [AnalyseController::class, 'store']);
     Route::patch('/analyses/{id}', [AnalyseController::class, 'update']);

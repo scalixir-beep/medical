@@ -97,7 +97,7 @@ export default function PrintDossier() {
       {/* Pied de page */}
       <div className="print-footer">
         <span>Document confidentiel — Usage médical exclusif</span>
-        <span>EPS2 · Plateforme Dossier Patient · v2.0</span>
+        <span>CHRASNT · Dossier Patient Informatisé · Thiès</span>
       </div>
     </div>
   );

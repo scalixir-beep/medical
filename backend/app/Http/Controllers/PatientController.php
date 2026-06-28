@@ -38,15 +38,20 @@ class PatientController extends Controller
     )]
     public function index(Request $request)
     {
-        $q = '%' . trim($request->query('q', '')) . '%';
+        $q     = '%' . trim($request->query('q', '')) . '%';
+        $limit = (int) $request->query('limit', 15);
+        $page  = max(1, (int) $request->query('page', 1));
 
-        return response()->json(
-            Patient::where('nom',    'like', $q)
-                ->orWhere('prenom', 'like', $q)
-                ->orWhere('code',   'like', $q)
-                ->orderBy('nom')->orderBy('prenom')
-                ->get()
-        );
+        $query = Patient::where('nom',    'like', $q)
+            ->orWhere('prenom', 'like', $q)
+            ->orWhere('code',   'like', $q)
+            ->orderBy('nom')->orderBy('prenom');
+
+        $total    = $query->count();
+        $pages    = (int) ceil($total / $limit);
+        $data     = $query->skip(($page - 1) * $limit)->take($limit)->get();
+
+        return response()->json(compact('data', 'total', 'pages'));
     }
 
     #[OA\Get(
